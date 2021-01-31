@@ -1,0 +1,10 @@
+tarantool/
+client_body_temp/
+fastcgi_temp/
+proxy_temp/
+scgi_temp/
+uwsgi_temp/
+logs/
+nginx_upstream_module/
+*.xlog
+*.snap
