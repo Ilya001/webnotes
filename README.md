@@ -35,3 +35,8 @@ $ cd ..
 ```bash
 ./nginx_upstream_module/nginx/objs/nginx -p nginx_app/
 ```
+
+## Vsсode
+Настройка окружения для разработки с js
+- [Расширения VSCode, которые облегчат разработку на JavaScript и Vue](https://habr.com/ru/post/440066/)
+- [Отладка VueJs в VS Code](https://ru.vuejs.org/v2/cookbook/debugging-in-vscode.html)
