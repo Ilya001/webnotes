@@ -3,5 +3,10 @@ import 'devextreme/dist/css/dx.light.css';
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { fetch } from 'whatwg-fetch'
 
-createApp(App).use(router).mount('#app')
+
+const app = createApp(App)
+app.use(router)
+app.mount('#app')
+app.config.globalProperties.$fetch = fetch;

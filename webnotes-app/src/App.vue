@@ -1,9 +1,10 @@
 <template>
+  <h1><a href="/home">@WebNotes</a></h1>
   <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/">Главная</router-link> |
+    <router-link to="/about">О нас</router-link>
   </div>
-  <router-view/>
+  <router-view />
 </template>
 
 <style>
@@ -12,6 +13,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  color: #2c3e50;
+}
+
+h1 a {
+  text-decoration: none;
   color: #2c3e50;
 }
 
@@ -24,7 +30,70 @@
   color: #2c3e50;
 }
 
-#nav a.router-link-exact-active {
+#nav a:hover {
   color: #42b983;
+}
+.preloader {
+  position: relative;
+  min-height: 60px;
+}
+
+.preloader:before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  height: 100%;
+  width: 100%;
+  display: block !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.preloader:after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  margin-left: -15px;
+  margin-top: -15px;
+  width: 30px;
+  height: 30px;
+  border: 4px rgba(0, 0, 0, 0.25) solid;
+  border-top: 4px #1071b6 solid;
+  border-radius: 50%;
+  -webkit-animation: preloader 0.6s infinite linear;
+  animation: preloader 0.6s infinite linear;
+}
+
+@-webkit-keyframes preloader {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+
+@keyframes preloader {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
 }
 </style>
