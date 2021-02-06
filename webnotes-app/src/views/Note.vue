@@ -180,8 +180,6 @@ export default {
               return response.json();
             })
             .then((data) => {
-              var date = new Date();
-              console.log(date, data);
               if (this.noteName != null && this.noteHtml) {
                 if (this.noteName != data.result[0].name) {
                   this.noteName = data.result[0].name;
