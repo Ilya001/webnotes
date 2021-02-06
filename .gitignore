@@ -8,3 +8,5 @@ logs/
 nginx_upstream_module/
 *.xlog
 *.snap
+*.log
+*.pid

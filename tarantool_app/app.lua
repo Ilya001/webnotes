@@ -1,5 +1,8 @@
 box.cfg{
     listen = 3312;
+    background = true,
+    log = '1.log',
+    pid_file = '1.pid'
 }
 box.once('grant', function()
     box.schema.user.grant('guest', 'read,write,execute', 'universe')

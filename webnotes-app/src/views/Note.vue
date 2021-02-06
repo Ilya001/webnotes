@@ -100,7 +100,7 @@ export default {
     noteName: function () {
       if (this.onClick && this.noteName != this.noteNameCash) {
         this.getter = false;
-        this.$fetch("http://localhost:8081/api/notes/update_note/", {
+        this.$fetch("/api/notes/update_note/", {
           method: "POST",
           body: JSON.stringify({
             params: [this.token, this.id, this.noteName, this.noteHtml],
@@ -120,7 +120,7 @@ export default {
     noteHtml: function () {
       if (this.onClick && this.noteHtml != this.noteNameCash) {
         this.getter = false;
-        this.$fetch("http://localhost:8081/api/notes/update_note/", {
+        this.$fetch("/api/notes/update_note/", {
           method: "POST",
           body: JSON.stringify({
             params: [this.token, this.id, this.noteName, this.noteHtml],
@@ -176,7 +176,7 @@ export default {
     getNote() {
       setInterval(() => {
         if (this.getter == true) {
-          this.$fetch("http://localhost:8081/api/notes/get_notes/", {
+          this.$fetch("/api/notes/get_notes/", {
             method: "POST",
             body: JSON.stringify({
               params: [this.token, this.id],
@@ -207,7 +207,7 @@ export default {
     },
     deleteNote() {
       this.getter = false;
-      this.$fetch("http://localhost:8081/api/notes/delete_note/", {
+      this.$fetch("/api/notes/delete_note/", {
         method: "POST",
         body: JSON.stringify({
           params: [this.token, this.id],
