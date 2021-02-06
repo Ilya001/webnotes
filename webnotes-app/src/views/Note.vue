@@ -2,11 +2,11 @@
   <div class="row">
     <template v-if="isActive">
       <div class="buttons-div">
-        <DxTextBox v-model:value="noteName" width="300px" @click="click" />
+        <DxTextBox v-model:value="noteName" width="300px" @mouseover="hover" />
         <DxButton @click="back" text="Назад" />
         <DxButton @click="deleteNote" text="Удалить заметку" />
       </div>
-      <DxHtmlEditor height="300px" v-model:value="noteHtml" @click="click">
+      <DxHtmlEditor height="300px" v-model:value="noteHtml" @mouseover="hover">
         <DxMediaResizing :enabled="true" />
         <DxToolbar :multiline="isMultiline">
           <DxItem format-name="undo" />
@@ -97,9 +97,8 @@ export default {
     }
   },
   watch: {
-    noteName: function () {
-      if (this.onClick && this.noteName != this.noteNameCash) {
-        this.getter = false;
+    noteName: function (name, oldName) {
+      if (this.onHover && name != oldName) {
         this.$fetch("http://localhost:8081/api/notes/update_note/", {
           method: "POST",
           body: JSON.stringify({
@@ -111,15 +110,14 @@ export default {
             return response.json();
           })
           .then((data) => {
-            if (data.result[0] == true) {
-              this.getter = true;
+            if (data.result[0] != true) {
+              throw Error(data)
             }
           });
       }
     },
-    noteHtml: function () {
-      if (this.onClick && this.noteHtml != this.noteNameCash) {
-        this.getter = false;
+    noteHtml: function (html, oldHtml) {
+      if (this.onHover && html != oldHtml) {
         this.$fetch("http://localhost:8081/api/notes/update_note/", {
           method: "POST",
           body: JSON.stringify({
@@ -131,8 +129,8 @@ export default {
             return response.json();
           })
           .then((data) => {
-            if (data.result[0] == true) {
-              this.getter = true;
+            if (data.result[0] != true) {
+              throw Error(data)
             }
           });
       }
@@ -156,26 +154,21 @@ export default {
       token: localStorage.getItem("token"),
       id: Number(this.$route.params.id),
       isActive: false,
-      getter: true,
-      onClick: false,
+      onHover: false,
       noteName: null,
-      noteNameCash: null,
       noteHtml: null,
-      noteHmtlCash: null,
     };
   },
   methods: {
-    click() {
-      this.onClick = true;
-      this.noteNameCash = this.noteName;
-      this.noteHmtlCash = this.noteHtml;
+    hover() {
+      this.onHover = !this.onHover;
     },
     back() {
       this.$router.push("/home");
     },
     getNote() {
       setInterval(() => {
-        if (this.getter == true) {
+        if (this.onHover == false) {
           this.$fetch("http://localhost:8081/api/notes/get_notes/", {
             method: "POST",
             body: JSON.stringify({
@@ -187,6 +180,8 @@ export default {
               return response.json();
             })
             .then((data) => {
+              var date = new Date();
+              console.log(date, data);
               if (this.noteName != null && this.noteHtml) {
                 if (this.noteName != data.result[0].name) {
                   this.noteName = data.result[0].name;
@@ -218,12 +213,11 @@ export default {
           return response.json();
         })
         .then((data) => {
-            if (data.result[0] == true){
-                this.$router.push('/home')
-            }
-            else{
-                throw Error(data);
-            }
+          if (data.result[0] == true) {
+            this.$router.push("/home");
+          } else {
+            throw Error(data);
+          }
         });
     },
   },
