@@ -7,6 +7,7 @@
 
 - Tarantool 2.6 - [Cсылка на инструкция по сборке](https://www.tarantool.io/ru/doc/latest/dev_guide/building_from_source/) !ВАЖНО в git clone поменять версию таранута
 - nginx_upstream
+- Vue CLI + devExtreme
 
 ## Nginx upstream
 
@@ -35,6 +36,11 @@ $ cd ..
 ```bash
 ./nginx_upstream_module/nginx/objs/nginx -p nginx_app/
 ```
+
+## Тур по папкам
+- `/nginx_app/conf` - nginx upstream module
+- `/tarantool_app/` - главная папка с tarantool
+- `/webnotes-app/` - папка с vue cli
 
 ## Vsсode
 Настройка окружения для разработки с js
