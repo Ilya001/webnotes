@@ -30,7 +30,7 @@ function user:start()
     end)
 end
 
-local function check_username(username)
+function user:check_username(username)
     local uniq = box.space.user.index.username:select{username}
     
     if uniq[1] == nil then
@@ -41,18 +41,18 @@ local function check_username(username)
 end
 
 function user:create_user(username, password)
-    local uniq = check_username(username)
+    local uniq = self:check_username(username)
 
     if uniq == true then
-        box.space.user:auto_increment({username, password, {'<div>Новая заметка</div>'}, ""})
-        return 200, "User registered successfully"
+        box.space.user:auto_increment({username, password, {{id = 1, name='New Note', text = '<div>Новая заметка</div>'}}, sha256:hexFromBin(username..os.time())})
+        return 200, "User registered "
     else 
         return 400, "User is already registered"
     end
 end
 
 function user:login(username, password)
-    if check_username(username) == false then
+    if self:check_username(username) == false then
         local this_user = box.space.user.index.username:select{username}
         if this_user[1][3] == password then
             local token = sha256:hexFromBin(username..os.time())
@@ -67,7 +67,7 @@ end
 
 function user:logout(token)
     if box.space.user.index.token:select{token}[1] ~= nil then
-        box.space.user.index.token:update({token}, {{'=', 'token', ''}})
+        box.space.user.index.token:update({token}, {{'=', 'token', sha256:hexFromBin(token..os.time())}})
         return true
     else
         return false

@@ -10,6 +10,11 @@ local notes = require('tarantool_app.src.notes')
 
 user:start()
 
+-- Check username uniq /api/auth/check_username
+function check_username(username)
+    return user:check_username(username)
+end
+
 -- Create user /api/auth/registration
 function create_user(username, password)
     local status, data = user:create_user(username, password)
@@ -27,8 +32,8 @@ function logout(token)
 end
 
 -- Get all notes /api/notes/get_notes
-function get_notes(token)
-    return notes:get_notes(token)
+function get_notes(token, id)
+    return notes:get_notes(token, id)
 end
 
 -- Create new note /api/notes/create_note
@@ -42,6 +47,6 @@ function delete_note(token, note_id)
 end
 
 -- Update note /api/notes/update_note
-function update_note(token, note_id, text)
-    return notes:update_note(token, note_id, text)
+function update_note(token, note_id, name, text)
+    return notes:update_note(token, note_id, name, text)
 end
