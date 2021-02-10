@@ -1,52 +1,72 @@
 box.cfg{
-    listen = 3312;
+    listen = 3312; 
 }
+
 box.once('grant', function()
     box.schema.user.grant('guest', 'read,write,execute', 'universe')
 end)
 
-local user = require('tarantool_app.src.user')
+local session = require('tarantool_app.src.session')
 local notes = require('tarantool_app.src.notes')
+local user = require('tarantool_app.src.user')
 
+session:start()
+notes:start()
 user:start()
 
--- Check username uniq /api/auth/check_username
 function check_username(username)
     return user:check_username(username)
 end
 
--- Create user /api/auth/registration
 function create_user(username, password)
-    local status, data = user:create_user(username, password)
-    return status, data
+    return user:create_user('username', 'password')
 end
 
--- Login /api/auth/login
 function login(username, password)
-    return user:login(username, password)
+    local status, key = user:login(username, password)
+    if status ~= nil and key ~= nil then
+        return status, key
+    else
+        return 'Логин или пароль введен не верно'
+    end
 end
 
--- Logout /api/auth/logout
 function logout(token)
     return user:logout(token)
 end
 
--- Get all notes /api/notes/get_notes
-function get_notes(token, id)
-    return notes:get_notes(token, id)
+function get_notes(token, key)
+    local note_id = session:check_user(token, key)
+    if note_id ~= nil then 
+        return notes:get_notes(note_id)
+    else
+        return "Bad data"
+    end
 end
 
--- Create new note /api/notes/create_note
-function create_note(token)
-    return notes:create_note(token)
+function add_note(token, key)
+    local note_id = session:check_user(token, key)
+    if note_id ~= nil then 
+        return notes:create_note(note_id)
+    else
+        return "Bad data"
+    end
 end
 
--- Delete note /api/notes/delete_note
-function delete_note(token, note_id)
-    return notes:delete_note(token, note_id)
+function delete_note(token, key, delete_note_id)
+    local note_id = session:check_user(token, key)
+    if note_id ~= nil then 
+        return notes:delete_note(note_id, delete_note_id)
+    else
+        return "Bad data"
+    end
 end
 
--- Update note /api/notes/update_note
-function update_note(token, note_id, name, text)
-    return notes:update_note(token, note_id, name, text)
+function update_note(token, key, update_note_id, name, html)
+    local note_id = session:check_user(token, key)
+    if note_id ~= nil then 
+        return notes:update_note(note_id, update_note_id, name, html)
+    else
+        return "Bad data"
+    end
 end

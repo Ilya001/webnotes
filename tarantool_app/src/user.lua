@@ -1,15 +1,28 @@
 local user = {}
+
 local sha256 = require('tarantool_app.src.sha256')
+local uuid = require('uuid')
+local notes = require('tarantool_app.src.notes')
+local session = require('tarantool_app.src.session')
+
+function user:check_username(username)
+    local uniq = box.space.user.index.username:select{username} 
+    if uniq[1] == nil then
+        return true
+    else 
+        return false
+    end
+end
 
 function user:start()
-    box.once('init', function()
+    box.once('init_user', function()
         box.schema.space.create('user', {if_not_exists=true})
         box.space.user:format({
-            {name='id', type='number'},
-            {name='username', type='string'},
-            {name='password', type='string'},
-            {name='notes', type='array'},
-            {name='token', type='string'}
+            {name = 'id', type = 'number'},
+            {name = 'username', type = 'string'},
+            {name = 'password', type = 'string'},
+            {name = 'key', type = 'uuid'},
+            {name = 'notesId', type = 'number'}
         })
         box.space.user:create_index('primary', {
             type='TREE',
@@ -20,59 +33,42 @@ function user:start()
         box.space.user:create_index('username', {
             type='hash',
             parts={'username'},
-            if_not_exists=true  
+            if_not_exists=true
         })
-        box.space.user:create_index('token', {
-            type='hash',
-            parts={'token'},
+        box.space.user:create_index('key', {
+            type='hash', 
+            parts={'key'},
             if_not_exists=true
         })
     end)
 end
 
-function user:check_username(username)
-    local uniq = box.space.user.index.username:select{username}
-    
-    if uniq[1] == nil then
-        return true
-    else 
-        return false
-    end
-end
-
 function user:create_user(username, password)
-    local uniq = self:check_username(username)
-
-    if uniq == true then
-        box.space.user:auto_increment({username, password, {{id = 1, name='New Note', text = '<div>Новая заметка</div>'}}, sha256:hexFromBin(username..os.time())})
-        return 200, "User registered "
-    else 
-        return 400, "User is already registered"
+    local uniq_user = self:check_username(username)   
+    if uniq_user then
+        local notesId = notes:create_note_obj()
+        local password = sha256:hexFromBin(password) 
+        return box.space.user:auto_increment{username, password, uuid.new(), notesId}
+    else
+        return nil
     end
 end
 
 function user:login(username, password)
-    if self:check_username(username) == false then
-        local this_user = box.space.user.index.username:select{username}
-        if this_user[1][3] == password then
-            local token = sha256:hexFromBin(username..os.time())
-            box.space.user.index.username:update({username}, {{'=', 'token', token}})
-            return token
+    local this_user = box.space.user.index.username:select{username}
+    if this_user ~= nil then
+        if this_user[1][3] == sha256:hexFromBin(password) then
+            return session:create(this_user[1][4], username), this_user[1][4]
+        else 
+            return nil, nil
         end
-        return false
     else
-        return false
+        return nil, nil
     end
 end
 
 function user:logout(token)
-    if box.space.user.index.token:select{token}[1] ~= nil then
-        box.space.user.index.token:update({token}, {{'=', 'token', sha256:hexFromBin(token..os.time())}})
-        return true
-    else
-        return false
-    end
+    return session:delete(token)
 end
-
 
 return user
