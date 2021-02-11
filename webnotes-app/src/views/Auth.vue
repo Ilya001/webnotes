@@ -75,7 +75,7 @@ export default {
   created: function () {
     let token = localStorage.getItem("token");
     if (token != null) {
-      this.$fetch("http://localhost:8081/api/auth/check_session/", {
+      this.$fetch("/api/auth/check_session/", {
         method: "POST",
         body: JSON.stringify({
           params: [token],
@@ -108,7 +108,7 @@ export default {
       if (result.isValid) {
         const login = result.validators[0]._validationInfo.result.value;
         const password = result.validators[1]._validationInfo.result.value;
-        this.$fetch("http://localhost:8081/api/auth/login/", {
+        this.$fetch("/api/auth/login/", {
           method: "POST",
           body: JSON.stringify({
             params: [login, password],
@@ -134,7 +134,7 @@ export default {
       if (result.isValid) {
         const login = result.validators[0]._validationInfo.result.value;
         const password = result.validators[1]._validationInfo.result.value;
-        this.$fetch("http://localhost:8081/api/auth/registration/", {
+        this.$fetch("/api/auth/registration/", {
           method: "POST",
           body: JSON.stringify({
             params: [login, password],
@@ -157,7 +157,7 @@ export default {
     checkUsername(e) {
       // Использую синхронные запросы!!!
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "http://localhost:8081/api/auth/check_username/", false);
+      xhr.open("POST", "/api/auth/check_username/", false);
       xhr.send(JSON.stringify({ params: [e.value] }));
       let response = JSON.parse(xhr.responseText);
       if (response.result[0] == true) {

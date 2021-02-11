@@ -21,7 +21,7 @@ export default {
   created: function () {
     let token = localStorage.getItem("token");
     if (token != null) {
-      this.$fetch("http://localhost:8081/api/auth/check_session/", {
+      this.$fetch("/api/auth/check_session/", {
         method: "POST",
         body: JSON.stringify({
           params: [token],

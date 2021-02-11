@@ -35,7 +35,7 @@ export default {
     let token = localStorage.getItem("token");
     let ukey = localStorage.getItem("ukey");
     if (token != null && ukey != null) {
-      this.$fetch("http://localhost:8081/api/auth/check_session/", {
+      this.$fetch("/api/auth/check_session/", {
         method: "POST",
         body: JSON.stringify({
           params: [token],
@@ -70,7 +70,7 @@ export default {
     },
     getNotes() {
       setInterval(() => {
-        this.$fetch("http://localhost:8081/api/notes/get_notes/", {
+        this.$fetch("/api/notes/get_notes/", {
           method: "POST",
           body: JSON.stringify({
             params: [this.token, this.ukey],
@@ -99,7 +99,7 @@ export default {
       }, 500);
     },
     createNote() {
-      this.$fetch("http://localhost:8081/api/notes/create_note/", {
+      this.$fetch("/api/notes/create_note/", {
         method: "POST",
         body: JSON.stringify({
           params: [this.token],
@@ -116,7 +116,7 @@ export default {
         });
     },
     logout() {
-      this.$fetch("http://localhost:8081/api/auth/logout/", {
+      this.$fetch("/api/auth/logout/", {
         method: "POST",
         body: JSON.stringify({
           params: [this.token],
