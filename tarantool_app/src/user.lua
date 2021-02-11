@@ -21,7 +21,7 @@ function user:start()
             {name = 'id', type = 'number'},
             {name = 'username', type = 'string'},
             {name = 'password', type = 'string'},
-            {name = 'key', type = 'uuid'},
+            {name = 'key', type = 'string'},
             {name = 'notesId', type = 'number'}
         })
         box.space.user:create_index('primary', {
@@ -47,8 +47,9 @@ function user:create_user(username, password)
     local uniq_user = self:check_username(username)   
     if uniq_user then
         local notesId = notes:create_note_obj()
-        local password = sha256:hexFromBin(password) 
-        return box.space.user:auto_increment{username, password, uuid.new(), notesId}
+        local password = sha256:hexFromBin(password)
+        local uid = uuid.str()
+        return box.space.user:auto_increment{username, password, uid, notesId}
     else
         return nil
     end
@@ -58,7 +59,7 @@ function user:login(username, password)
     local this_user = box.space.user.index.username:select{username}
     if this_user ~= nil then
         if this_user[1][3] == sha256:hexFromBin(password) then
-            return session:create(this_user[1][4], username), this_user[1][4]
+            return session:create(this_user[1][4]), this_user[1][4]
         else 
             return nil, nil
         end

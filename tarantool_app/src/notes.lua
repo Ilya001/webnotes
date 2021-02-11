@@ -16,10 +16,18 @@ function notes:start()
     end)
 end
 
-function notes:get_notes(notes_id)
+function notes:get_notes(notes_id, this_note_id)
     local note = box.space.notes:select{notes_id}
     if note ~= nil then
-        return note
+        if this_note_id ~= nil then
+            for key, _ in pairs(note[1][2]) do
+                if this_note_id == note[1][2][key]['id'] then
+                    return note[1][2][key]    
+                end
+            end
+        else
+            return note
+        end
     else
         return nil
     end
@@ -54,10 +62,11 @@ function notes:delete_note(notes_id, delete_note_id)
                 table.remove(this_note_list, delete_note_id)
             end
         end
-        for key, value in pairs(this_note_list) do
+        for key, _ in pairs(this_note_list) do
             this_note_list[key]['id'] = key
         end
-        return box.space.notes:update({notes_id}, {{'=', 'notes', this_note_list}}) 
+        box.space.notes:update({notes_id}, {{'=', 'notes', this_note_list}}) 
+        return true
     else
         return nil
     end
@@ -73,7 +82,8 @@ function notes:update_note(notes_id, update_note_id, name, html)
                 this_note_list[key]['html'] = html
             end
         end
-        return box.space.notes:update({notes_id}, {{'=', 'notes', this_note_list}})
+        box.space.notes:update({notes_id}, {{'=', 'notes', this_note_list}})
+        return true
     else
         return nil
     end

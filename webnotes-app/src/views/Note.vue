@@ -60,6 +60,7 @@ export default {
       ],
       headerValues: [false, 1, 2, 3, 4, 5],
       token: localStorage.getItem("token"),
+      ukey: localStorage.getItem("ukey"),
       noteId: Number(this.$route.params.id),
       noteName: null,
       noteHtml: null,
@@ -67,7 +68,24 @@ export default {
   },
   created() {
     let token = localStorage.getItem("token");
-    if (token == null) {
+    let ukey = localStorage.getItem("ukey");
+    if (token != null && ukey != null) {
+      this.$fetch("http://localhost:8081/api/auth/check_session/", {
+        method: "POST",
+        body: JSON.stringify({
+          params: [token],
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+        .then((data) => {
+          if (data.result[0] != true) {
+            this.$router.push("/home/auth");
+          }
+        });
+    } else {
       this.$router.push("/home/auth");
     }
   },
@@ -75,7 +93,7 @@ export default {
     this.$fetch("http://localhost:8081/api/notes/get_notes/", {
       method: "POST",
       body: JSON.stringify({
-        params: [this.token, this.noteId],
+        params: [this.token, this.ukey, this.noteId],
       }),
     })
       .then((response) => {
@@ -83,9 +101,9 @@ export default {
         return response.json();
       })
       .then((data) => {
-        if (data.result[0] != null) {
+        if (data.result != null) {
           this.noteName = data.result[0].name;
-          this.noteHtml = data.result[0].text;
+          this.noteHtml = data.result[0].html;
         }
       });
   },
@@ -94,7 +112,7 @@ export default {
       this.$fetch("http://localhost:8081/api/notes/update_note/", {
           method: "POST",
           body: JSON.stringify({
-            params: [this.token, this.noteId, this.noteName, this.noteHtml],
+            params: [this.token, this.ukey, this.noteId, this.noteName, this.noteHtml],
           }),
         })
           .then((response) => {
@@ -111,7 +129,7 @@ export default {
       this.$fetch("http://localhost:8081/api/notes/update_note/", {
           method: "POST",
           body: JSON.stringify({
-            params: [this.token, this.noteId, this.noteName, this.noteHtml],
+            params: [this.token, this.ukey, this.noteId, this.noteName, this.noteHtml],
           }),
         })
           .then((response) => {
@@ -133,7 +151,7 @@ export default {
       this.$fetch("http://localhost:8081/api/notes/delete_note/", {
         method: "POST",
         body: JSON.stringify({
-          params: [this.token, this.noteId],
+          params: [this.token, this.ukey, this.noteId],
         }),
       })
         .then((response) => {

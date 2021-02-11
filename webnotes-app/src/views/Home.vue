@@ -33,16 +33,34 @@ export default {
   },
   created: function () {
     let token = localStorage.getItem("token");
-    if (token == null) {
-      this.$router.push("/home/auth");
+    let ukey = localStorage.getItem("ukey");
+    if (token != null && ukey != null) {
+      this.$fetch("http://localhost:8081/api/auth/check_session/", {
+        method: "POST",
+        body: JSON.stringify({
+          params: [token],
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+        .then((data) => {
+          if (data.result[0] != true) {
+            this.$router.push("/home/auth");
+          } else {
+            this.getNotes();
+          }
+        });
     } else {
-      this.getNotes();
+      this.$router.push("/home/auth");
     }
   },
   data() {
     return {
       notesList: null,
       token: localStorage.getItem("token"),
+      ukey: localStorage.getItem("ukey"),
       isActive: false,
     };
   },
@@ -55,7 +73,7 @@ export default {
         this.$fetch("http://localhost:8081/api/notes/get_notes/", {
           method: "POST",
           body: JSON.stringify({
-            params: [this.token],
+            params: [this.token, this.ukey],
           }),
         })
           .then((response) => {
@@ -64,13 +82,15 @@ export default {
           })
           .then((data) => {
             if (this.notesList != null) {
-              let last_data_count = this.notesList.length;
-              if (last_data_count != data.result[0].length) {
-                this.isActive = false;
-                this.notesList = data.result[0];
+              if (data.result != null) {
+                let last_data_count = this.notesList.length;
+                if (last_data_count != data.result[0][0][1].length) {
+                  this.isActive = false;
+                  this.notesList = data.result[0][0][1];
+                }
               }
             } else {
-              this.notesList = data.result[0];
+              this.notesList = data.result[0][0][1];
             }
           });
         if (this.notesList != null) {
@@ -107,13 +127,15 @@ export default {
           return response.json();
         })
         .then((data) => {
-          if (data.result[0] != true){
-            throw Error(data)
+          this.isActive = false;
+          if (data.result[0] != true) {
+            throw Error(data);
           }
-          this.$router.push('/home/auth')
+          this.$router.push("/home/auth");
         });
-      delete localStorage.token
-    }
+      delete localStorage.token;
+      delete localStorage.ukey;
+    },
   },
 };
 </script>

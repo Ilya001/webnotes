@@ -18,8 +18,17 @@ function check_username(username)
     return user:check_username(username)
 end
 
+function check_session(token)
+    return session:check_token(token)
+end
+
 function create_user(username, password)
-    return user:create_user('username', 'password')
+    local user = user:create_user(username, password) 
+    if user ~= nil then
+        return true
+    else
+        return false
+    end
 end
 
 function login(username, password)
@@ -27,7 +36,7 @@ function login(username, password)
     if status ~= nil and key ~= nil then
         return status, key
     else
-        return 'Логин или пароль введен не верно'
+        return false
     end
 end
 
@@ -35,16 +44,16 @@ function logout(token)
     return user:logout(token)
 end
 
-function get_notes(token, key)
+function get_notes(token, key, this_note_id)
     local note_id = session:check_user(token, key)
     if note_id ~= nil then 
-        return notes:get_notes(note_id)
+        return notes:get_notes(note_id, this_note_id)
     else
         return "Bad data"
     end
 end
 
-function add_note(token, key)
+function create_note(token, key)
     local note_id = session:check_user(token, key)
     if note_id ~= nil then 
         return notes:create_note(note_id)
