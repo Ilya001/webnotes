@@ -1,44 +1,78 @@
 <template>
-  <div class="row">
-    <DxButton text="Выйти" @click="logout" />
-  </div>
-  <div class="row">
-    <template v-if="isActive">
-      <DxList>
-        <DxItem v-for="note in notesList" :key="note.id" @click="open(note.id)">
-          <template #default>
-            {{ note.name }}
-          </template>
-        </DxItem>
-      </DxList>
+  <div class="wrapper">
+    <div class="buttons-wrapper">
+      <DxButton
+        class="button"
+        text="Создать новую заметку"
+        @click="createNote"
+      />
+    </div>
+    <template v-if="isActive == true">
+      <OneNote
+        v-for="note in notesList"
+        :note="note"
+        :key="note.id"
+        v-on:deleteNote="deleteNote"
+        v-on:openNote="openNote"
+        @click="openNote(note.id)"
+      ></OneNote>
     </template>
     <template v-else>
       <div class="preloader"></div>
     </template>
   </div>
-  <div class="row">
-    <DxButton text="Создать новую заметку" @click="createNote" />
-  </div>
 </template>
- 
+
 <script>
-import DxList, { DxItem } from "devextreme-vue/list";
+import OneNote from "@/components/OneNote";
 import DxButton from "devextreme-vue/button";
 
 export default {
+  name: "Home",
   components: {
-    DxList,
-    DxItem,
     DxButton,
+    OneNote,
+  },
+  data() {
+    return {
+      notesList: null,
+      isActive: false,
+    };
   },
   created: function () {
-    let token = localStorage.getItem("token");
-    let ukey = localStorage.getItem("ukey");
-    if (token != null && ukey != null) {
-      this.$fetch("/api/auth/check_session/", {
+    let isAuth = this.$store.getters.isAuth;
+    if (isAuth != null) {
+      isAuth
+        .then((status) => {
+          if (status == true) {
+            if (
+              this.$store.state.token != null &&
+              this.$store.state.ukey != null
+            ) {
+              this.getNotes();
+            } else {
+              this.$router.push("/home/auth");
+            }
+          }
+        })
+        .catch((error) => {
+          if (error == false) {
+            this.$router.push("/home/auth");
+          }
+        });
+    } else {
+      this.$router.push("/home/auth");
+    }
+  },
+  methods: {
+    openNote(id) {
+      this.$router.push(`/home/note/${id}`);
+    },
+    deleteNote(id) {
+      this.$fetch("http://localhost:8081/api/notes/delete_note/", {
         method: "POST",
         body: JSON.stringify({
-          params: [token],
+          params: [this.$store.state.token, this.$store.state.ukey, id],
         }),
       })
         .then((response) => {
@@ -47,33 +81,33 @@ export default {
         })
         .then((data) => {
           if (data.result[0] != true) {
-            this.$router.push("/home/auth");
-          } else {
-            this.getNotes();
+            throw Error(data);
           }
         });
-    } else {
-      this.$router.push("/home/auth");
-    }
-  },
-  data() {
-    return {
-      notesList: null,
-      token: localStorage.getItem("token"),
-      ukey: localStorage.getItem("ukey"),
-      isActive: false,
-    };
-  },
-  methods: {
-    open(id) {
-      this.$router.push(`/home/note/${id}`);
+    },
+    createNote() {
+      this.$fetch("http://localhost:8081/api/notes/create_note/", {
+        method: "POST",
+        body: JSON.stringify({
+          params: [this.$store.state.token, this.$store.state.ukey],
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+        .then((data) => {
+          if (data.result[0] == "Bad data") {
+            throw Error(data);
+          }
+        });
     },
     getNotes() {
       setInterval(() => {
-        this.$fetch("/api/notes/get_notes/", {
+        this.$fetch("http://localhost:8081/api/notes/get_notes/", {
           method: "POST",
           body: JSON.stringify({
-            params: [this.token, this.ukey],
+            params: [this.$store.state.token, this.$store.state.ukey],
           }),
         })
           .then((response) => {
@@ -96,55 +130,23 @@ export default {
         if (this.notesList != null) {
           this.isActive = true;
         }
-      }, 500);
-    },
-    createNote() {
-      this.$fetch("/api/notes/create_note/", {
-        method: "POST",
-        body: JSON.stringify({
-          params: [this.token],
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) throw Error(response.statusText);
-          return response.json();
-        })
-        .then((data) => {
-          if (data.result[0] != true) {
-            throw Error(data);
-          }
-        });
-    },
-    logout() {
-      this.$fetch("/api/auth/logout/", {
-        method: "POST",
-        body: JSON.stringify({
-          params: [this.token],
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) throw Error(response.statusText);
-          return response.json();
-        })
-        .then((data) => {
-          this.isActive = false;
-          if (data.result[0] != true) {
-            throw Error(data);
-          }
-          this.$router.push("/home/auth");
-        });
-      delete localStorage.token;
-      delete localStorage.ukey;
+      }, 1000);
     },
   },
 };
 </script>
 
-<style scoped>
-.isActiveFalse {
-  display: none;
+<style lang="scss" scoped>
+.wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-.row {
-  margin: 2em;
+
+.buttons-wrapper {
+  margin-bottom: 2em;
+  display: flex;
+  align-content: center;
+  justify-content: center;
 }
 </style>

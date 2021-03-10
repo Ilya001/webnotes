@@ -6,7 +6,8 @@
 Все собирем из сходников
 
 - Tarantool 2.6 - [Cсылка на инструкция по сборке](https://www.tarantool.io/ru/doc/latest/dev_guide/building_from_source/) !ВАЖНО в git clone поменять версию таранута
-- nginx_upstream
+- nginx_upstream последняя версия просто с гита
+- Vue CLI - 3, 4
 
 ## Nginx upstream
 
@@ -36,7 +37,8 @@ $ cd ..
 ./nginx_upstream_module/nginx/objs/nginx -p nginx_app/
 ```
 
-## Vsсode
-Настройка окружения для разработки с js
-- [Расширения VSCode, которые облегчат разработку на JavaScript и Vue](https://habr.com/ru/post/440066/)
-- [Отладка VueJs в VS Code](https://ru.vuejs.org/v2/cookbook/debugging-in-vscode.html)
+Собираем Vue. Находимся в `webnotes-app/`
+```bash
+npm install
+npm run build
+```

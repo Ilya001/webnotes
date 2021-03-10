@@ -46,7 +46,7 @@ end
 function session:check_token(token)
     if token ~= nil then
         local status = box.space.session.index.token:select{token}
-        if status == nil then
+        if status[1] == nil then
             return false
         else
             return true

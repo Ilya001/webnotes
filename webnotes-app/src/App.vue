@@ -1,43 +1,101 @@
 <template>
-  <h1><a href="/home">@WebNotes</a></h1>
-  <div id="nav">
-    <router-link to="/">Главная</router-link> |
-    <router-link to="/about">О нас</router-link>
+  <div id="app">
+    <div class="container">
+      <Header></Header>
+      <main>
+        <router-view />
+      </main>
+      <Footer></Footer>
+    </div>
   </div>
-  <router-view />
 </template>
 
-<style>
+<script>
+import Header from "@/components/Header.vue";
+import Footer from "@/components/Footer.vue";
+
+export default {
+  name: "App",
+  components: {
+    Header,
+    Footer,
+  },
+};
+</script>
+
+<style lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@500;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: white;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  font-family: "Source Code Pro", monospace !important;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  height: 100vh;
 }
 
-h1 a {
+a {
   text-decoration: none;
-  color: #2c3e50;
+  color: white !important;
 }
 
-#nav {
-  padding: 30px;
+.container {
+  padding: 0 15px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  @media (min-width: 575.98px) {
+    max-width: 540px;
+    margin: auto;
+    padding: 0;
+  }
+
+  @media (min-width: 767.98px) {
+    max-width: 720px;
+  }
+
+  @media (min-width: 991.98px) {
+    max-width: 960px;
+  }
+
+  @media (min-width: 1199.98px) {
+    max-width: 1140px;
+  }
 }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+main {
+  flex: 1 0 auto;
+  margin: 1em 0;
 }
 
-#nav a:hover {
-  color: #42b983;
+.button {
+  border-radius: 5px;
+  font-family: "Source Code Pro", monospace !important;
+
+  &:hover {
+    color: #dc9705 !important;
+  }
 }
+
+.input {
+  border-radius: 5px !important;
+  font-family: "Source Code Pro", monospace !important;
+}
+
 .preloader {
   position: relative;
   min-height: 60px;
 }
-
 .preloader:before {
   content: "";
   position: absolute;
@@ -46,7 +104,6 @@ h1 a {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
   height: 100%;
   width: 100%;
   display: block !important;
@@ -55,7 +112,6 @@ h1 a {
   -ms-user-select: none;
   user-select: none;
 }
-
 .preloader:after {
   content: "";
   position: absolute;
@@ -72,25 +128,21 @@ h1 a {
   -webkit-animation: preloader 0.6s infinite linear;
   animation: preloader 0.6s infinite linear;
 }
-
 @-webkit-keyframes preloader {
   0% {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
-
   to {
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
   }
 }
-
 @keyframes preloader {
   0% {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
-
   to {
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
